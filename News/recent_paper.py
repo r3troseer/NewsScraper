@@ -7,7 +7,7 @@ the_nation_url="https://thenationonlineng.net/news/"
 tribune_url="https://tribuneonlineng.com/category/top-news/"
 vanguard_url="https://www.vanguardngr.com/category/top-stories/"
 
-def get_recent_articles(base_url, max_articles=10, max_age_days=2, max_retries=3):
+def get_recent_articles(base_url, max_articles=5, max_age_days=2, max_retries=3):
     """
     Get recent articles from a news website.
 
@@ -36,6 +36,7 @@ def get_recent_articles(base_url, max_articles=10, max_age_days=2, max_retries=3
             break  # Stop once 10 articles has been collected.
 
         retries = 0
+        article_processed = False  # Flag to track if the article has been successfully processed
         while retries < max_retries:
             try:
                 # Download and parse the article.
@@ -62,14 +63,21 @@ def get_recent_articles(base_url, max_articles=10, max_age_days=2, max_retries=3
                     }
                     articles_list.append(article_info)
                     # print(articles_list)
+                    article_processed = True  # Set the flag to True for successful processing
                     break  # Successful parsing, exit retry loop
-        
+                
             except Exception as e:
                 print(f"Error processing article (Retry {retries + 1}):", e)
                 retries += 1
                 if retries >= max_retries:
-                    print(f"Maximum retries ({max_retries}) reached for this article. Skipping.")
+                    article_processed = False  # Set the flag to back False for unsuccessful processing
+                    print(f"Maximum retries ({max_retries}) reached for this article.")
                     break  # Maximum retries reached, exit retry loop
+        if not article_processed:
+            # Break out of the outer for loop if the article couldn't be processed after max_retries.
+            print("Skipping article due to processing errors.")
+            break
+
     
     return articles_list
     
