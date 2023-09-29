@@ -1,11 +1,12 @@
-from newspaper import Article, build
+from newspaper import build
 from datetime import datetime, timedelta, timezone
 
-dailypost_url="https://dailypost.ng/hot-news/"
-punch_url='https://punchng.com/topics/news/'
-the_nation_url="https://thenationonlineng.net/news/"
-tribune_url="https://tribuneonlineng.com/category/top-news/"
-vanguard_url="https://www.vanguardngr.com/category/top-stories/"
+dailypost_url = "https://dailypost.ng/hot-news/"
+punch_url = "https://punchng.com/topics/news/"
+the_nation_url = "https://thenationonlineng.net/news/"
+tribune_url = "https://tribuneonlineng.com/category/top-news/"
+vanguard_url = "https://www.vanguardngr.com/category/top-stories/"
+
 
 def get_recent_articles(base_url, max_articles=5, max_age_days=2, max_retries=3):
     """
@@ -25,7 +26,7 @@ def get_recent_articles(base_url, max_articles=5, max_age_days=2, max_retries=3)
 
     # Initialize a list to store dictionaries for each article.
     articles_list = []
-    # articles = []
+
     # Define the maximum age for articles (2 days ago from the current date by default).
     max_age = datetime.now(timezone.utc) - timedelta(days=max_age_days)
     print(max_age)
@@ -36,7 +37,9 @@ def get_recent_articles(base_url, max_articles=5, max_age_days=2, max_retries=3)
             break  # Stop once 10 articles has been collected.
 
         retries = 0
-        article_processed = False  # Flag to track if the article has been successfully processed
+        article_processed = (
+            False  # Flag to track if the article has been successfully processed
+        )
         while retries < max_retries:
             try:
                 # Download and parse the article.
@@ -50,27 +53,24 @@ def get_recent_articles(base_url, max_articles=5, max_age_days=2, max_retries=3)
                 # Check if the article is within the desired age limit.
                 if published_date is not None and published_date >= max_age:
                     # Create a dictionary to store article information.
-                    # title=article.title
-                    # text=article.text
-                    # url=article.url
-                    # articles_list.append(
-                    #     (title,text,url,)
-                    # )
                     article_info = {
-                        'title': article.title,
-                        'text': article.text,
-                        'url': article.url
+                        "title": article.title,
+                        "text": article.text,
+                        "url": article.url,
                     }
                     articles_list.append(article_info)
-                    # print(articles_list)
-                    article_processed = True  # Set the flag to True for successful processing
+                    article_processed = (
+                        True  # Set the flag to True for successful processing
+                    )
                     break  # Successful parsing, exit retry loop
-                
+
             except Exception as e:
                 print(f"Error processing article (Retry {retries + 1}):", e)
                 retries += 1
                 if retries >= max_retries:
-                    article_processed = False  # Set the flag to back False for unsuccessful processing
+                    article_processed = (
+                        False  # Set the flag to back False for unsuccessful processing
+                    )
                     print(f"Maximum retries ({max_retries}) reached for this article.")
                     break  # Maximum retries reached, exit retry loop
         if not article_processed:
@@ -78,11 +78,11 @@ def get_recent_articles(base_url, max_articles=5, max_age_days=2, max_retries=3)
             print("Skipping article due to processing errors.")
             break
 
-    
     return articles_list
-    
+
+
 if __name__ == "__main__":
-    articles=get_recent_articles(dailypost_url, max_age_days=4)
+    articles = get_recent_articles(dailypost_url, max_age_days=4)
     for idx, article in enumerate(articles, start=1):
         print(f"Article {idx}:")
         print(f"Title: {article['title']}")
